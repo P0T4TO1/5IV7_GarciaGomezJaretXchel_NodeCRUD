@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const urlencodedParser = bodyParser.urlencoded({extended: false});
 
-
+// img storage
 const diskstorage = multer.diskStorage({
     destination: path.join(__dirname, "../images"),
     filename: (req, file, cb) => {
@@ -26,6 +26,7 @@ const isImage = (req,file,callback)=>{
     }
 }
 
+
 const fileUpload = multer({
     storage: diskstorage,
     fileFilter: isImage
@@ -37,7 +38,7 @@ const fileUpdate = multer({
 }).single('newImg')
 
 
-// create
+// registrar peliculas
 router.post("/addMovie", fileUpload, urlencodedParser, (req,res)=>{
     const title = req.body.movieTitle;
     const director = req.body.director;
@@ -62,7 +63,7 @@ router.post("/addMovie", fileUpload, urlencodedParser, (req,res)=>{
     }
 });
 
-// get user data
+// obtener todas la peliculas para mostrarlas
 router.get("/readAll", (req, res) => {
 
     conn.query("SELECT id_pelicula, nom_pelicula, year_movie, img_pelicula, nom_director, g.nom_genero FROM db_crud.peliculas as p inner join generos as g on p.id_genero = g.id_genero",
@@ -75,6 +76,7 @@ router.get("/readAll", (req, res) => {
         });
 });
 
+// obtener la pelicula para editar
 router.get("/readOneMovie/:id", (req, res) => {
     const id = req.params.id;
     conn.query("SELECT id_pelicula, nom_pelicula, year_movie, img_pelicula, nom_director, g.nom_genero, g.id_genero FROM db_crud.peliculas as p inner join generos as g on p.id_genero = g.id_genero where id_pelicula = ?"
@@ -87,6 +89,7 @@ router.get("/readOneMovie/:id", (req, res) => {
         });
 });
 
+// editar pelicula
 router.post("/update/:id", fileUpdate, urlencodedParser, (req, res) => {
     console.log("entro en update")
     const title = req.body.newTitle;
@@ -114,7 +117,7 @@ router.post("/update/:id", fileUpdate, urlencodedParser, (req, res) => {
     }
 });
 
-// delete user
+// eliminar pelicula
 router.delete("/delete/:id",(req,res)=>{
     const {id} = req.params;
     try {
@@ -133,7 +136,7 @@ router.delete("/delete/:id",(req,res)=>{
     }
 })
 
-
+// obtener todos los generos de la base de datos
 router.get("/getCategories", (req, res) => {
     conn.query("SELECT * FROM generos",
         (err, result) => {
